@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoveMate Logistics</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#182230}
+nav{background:#123c69;color:white;padding:18px 7%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:24px;font-weight:bold}.hero{padding:70px 7%;background:linear-gradient(135deg,#e8f3ff,#fff);text-align:center}
+.hero h1{font-size:42px;margin:10px}.hero p{font-size:18px;color:#566}
+.container{max-width:1000px;margin:35px auto;padding:0 20px}
+.card{background:white;padding:28px;border-radius:16px;box-shadow:0 8px 25px #00000012;margin-bottom:25px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{font-weight:bold;display:block;margin-bottom:6px}input,select,textarea{width:100%;padding:12px;border:1px solid #ccd5df;border-radius:8px;margin-bottom:15px}
+button{background:#1677d2;color:white;border:0;padding:13px 20px;border-radius:8px;font-weight:bold;cursor:pointer}
+button:hover{background:#0e5da9}.services{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.service{padding:20px;background:#f0f6ff;border-radius:12px;text-align:center}
+.success{display:none;background:#e8fff0;border-left:5px solid #16a34a;padding:18px;border-radius:8px;margin-top:20px}
+.track{display:flex;gap:10px}.track input{margin:0}.small{color:#657386;font-size:13px}
+footer{text-align:center;padding:30px;color:#667085}
+@media(max-width:700px){.grid,.services{grid-template-columns:1fr}.hero h1{font-size:30px}.track{display:block}.track button{margin-top:8px}}
+</style>
+</head>
+<body>
+<nav><div class="logo">🚚 MoveMate Logistics</div><div>Safe • Fast • Reliable</div></nav>
+
+<section class="hero">
+<h1>Goods & Shifting Services</h1>
+<p>Book home shifting, office shifting, packing and goods transportation in one place.</p>
+</section>
+
+<div class="container">
+<div class="card">
+<h2>Our Services</h2>
+<div class="services">
+<div class="service">🏠<br><b>Home Shifting</b></div>
+<div class="service">🏢<br><b>Office Shifting</b></div>
+<div class="service">📦<br><b>Goods Transport</b></div>
+<div class="service">🚛<br><b>Vehicle Transport</b></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Book a Service</h2>
+<form id="bookingForm">
+<div class="grid">
+<div><label>Full Name</label><input id="name" required></div>
+<div><label>Mobile Number</label><input id="phone" pattern="[0-9]{10}" maxlength="10" required></div>
+<div><label>From Address</label><textarea id="from" required></textarea></div>
+<div><label>To Address</label><textarea id="to" required></textarea></div>
+<div><label>Service</label><select id="service" required><option value="">Select</option><option>Home Shifting</option><option>Office Shifting</option><option>Goods Transport</option><option>Vehicle Transport</option></select></div>
+<div><label>Shifting Date</label><input id="date" type="date" required></div>
+</div>
+<label>Goods / Additional Details</label>
+<textarea id="details" placeholder="Furniture, boxes, appliances, approximate quantity..."></textarea>
+<button type="submit">Confirm Booking</button>
+</form>
+<div id="success" class="success"></div>
+</div>
+
+<div class="card">
+<h2>Track Your Booking</h2>
+<p class="small">Bookings are saved in this browser prototype. In the Java/Spring Boot version, they can be stored permanently in MySQL and synchronized with Zoho.</p>
+<div class="track"><input id="trackId" placeholder="Enter Booking ID"><button onclick="trackBooking()">Track</button></div>
+<div id="trackingResult" style="margin-top:15px"></div>
+</div>
+</div>
+
+<footer>© 2026 MoveMate Logistics • Zoho-ready prototype</footer>
+
+<script>
+const KEY="movemate_bookings";
+
+function makeId(){
+  return "MM-" + new Date().getFullYear() + "-" + Math.floor(10000 + Math.random()*90000);
+}
+
+document.getElementById("bookingForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const booking={
+    id:makeId(),
+    name:document.getElementById("name").value,
+    phone:document.getElementById("phone").value,
+    from:document.getElementById("from").value,
+    to:document.getElementById("to").value,
+    service:document.getElementById("service").value,
+    date:document.getElementById("date").value,
+    details:document.getElementById("details").value,
+    status:"Booking Confirmed",
+    createdAt:new Date().toISOString()
+  };
+  const bookings=JSON.parse(localStorage.getItem(KEY)||"[]");
+  bookings.push(booking);
+  localStorage.setItem(KEY,JSON.stringify(bookings));
+
+  document.getElementById("success").style.display="block";
+  document.getElementById("success").innerHTML=
+    "<b>✅ Booking Successful!</b><br>Booking ID: <strong>"+booking.id+
+    "</strong><br>Please save this ID. You can close the browser safely; this prototype keeps the booking in local storage.";
+  document.getElementById("bookingForm").reset();
+});
+
+function trackBooking(){
+  const id=document.getElementById("trackId").value.trim();
+  const bookings=JSON.parse(localStorage.getItem(KEY)||"[]");
+  const b=bookings.find(x=>x.id===id);
+  document.getElementById("trackingResult").innerHTML=b
+    ? "<div class='success' style='display:block'><b>"+b.id+"</b><br>Service: "+b.service+"<br>Date: "+b.date+"<br>Status: "+b.status+"<br>From: "+b.from+"<br>To: "+b.to+"</div>"
+    : "<p>❌ Booking not found.</p>";
+}
+</script>
+</body>
+</html>
